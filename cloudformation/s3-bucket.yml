@@ -1,3 +1,4 @@
+#Our CloudFormation template to create an S3 bucket // Testing Purposes Only
 AWSTemplateFormatVersion: '2010-09-09'
 Description: 'Create an S3 bucket for CICD PR'
 
