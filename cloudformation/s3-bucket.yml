@@ -1,4 +1,5 @@
 #Our CloudFormation template to create an S3 bucket // Testing Purposes Only
+
 AWSTemplateFormatVersion: '2010-09-09'
 Description: 'Create an S3 bucket for CICD PR'
 
@@ -26,3 +27,5 @@ Outputs:
   BucketName:
     Description: 'Name of created S3 Bucket'
     Value: !GetAtt MyS3Bucket.BucketName
+
+# This is a simple CloudFormation template that creates an S3 bucket.
