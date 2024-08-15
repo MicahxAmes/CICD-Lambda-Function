@@ -26,10 +26,16 @@ jobs:
               run: |
                 aws cloudformation validate-template --template-body file://cloudformation/s3-bucket.yml
 
-            - name: Deploy our stack
-              run: | 
+            - name: Deploy or update our stack
+              run: |
                 stack_name="pr-test-stack-${{github.event.pull_request.number}}"
-                aws cloudformation create-stack --stack-name $stack_name --template-body file://cloudformation/s3-bucket.yml --parameters ParameterKey=Environment,ParameterValue=test
+                if aws cloudformation describe-stacks --stack-name $stack_name; then
+                  echo "Stack exists, updating..."
+                  aws cloudformation update-stack --stack-name $stack_name --template-body file://cloudformation/s3-bucket.yml --parameters ParameterKey=Environment,ParameterValue=test
+                else
+                  echo "Stack does not exist, creating..."
+                  aws cloudformation create-stack --stack-name $stack_name --template-body file://cloudformation/s3-bucket.yml --parameters ParameterKey=Environment,ParameterValue=test
+                fi
 
             - name: Comment on the PR
               uses: actions/github-script@v6
@@ -41,7 +47,7 @@ jobs:
                     issue_number: context.issue.number,
                     owner: context.repo.owner,
                     repo: context.repo.repo,
-                    body: `CloudFormation test stack created successfully! Stack name: pr-test-stack-${{github.event.pull_request.number}}`
+                    body: `CloudFormation test stack created or updated successfully! Stack name: pr-test-stack-${{github.event.pull_request.number}}`
                   });
 
     cleanup-on-merge:
