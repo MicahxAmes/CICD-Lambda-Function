@@ -36,18 +36,19 @@ jobs:
               with: 
                 github-token: ${{ secrets.GITHUB_TOKEN }}
                 script: |
-                  github.issues.createComment({
+                  const { github, context } = require('@actions/github');
+                  github.rest.issues.createComment({
                     issue_number: context.issue.number,
                     owner: context.repo.owner,
                     repo: context.repo.repo,
-                    body: 'CloudFormation test stack created successfully! Stack name: pr-test-stack-${{github.event.pull_request.number}}'
-                  })
+                    body: `CloudFormation test stack created successfully! Stack name: pr-test-stack-${{github.event.pull_request.number}}`
+                  });
 
     cleanup-on-merge:
         runs-on: ubuntu-latest
         if: github.event.pull_request.merged == true 
         steps:
-            - name: Confgiure AWS credentials
+            - name: Configure AWS credentials
               uses: aws-actions/configure-aws-credentials@v1
               with:
                 aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -58,4 +59,3 @@ jobs:
               run: |
                 stack_name="pr-test-stack-${{github.event.pull_request.number}}"
                 aws cloudformation delete-stack --stack-name $stack_name
- 
